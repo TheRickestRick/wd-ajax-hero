@@ -1,7 +1,7 @@
 (function() {
   'use strict';
 
-  const movies = [];
+  let movies = [];
 
   const renderMovies = function() {
     $('#listings').empty();
@@ -14,16 +14,16 @@
 
       $title.attr({
         'data-position': 'top',
-        'data-tooltip': movie.title
+        'data-tooltip': movie.Title
       });
 
-      $title.tooltip({ delay: 50 }).text(movie.title);
+      $title.tooltip({ delay: 50 }).text(movie.Title);
 
       const $poster = $('<img>').addClass('poster');
 
       $poster.attr({
-        src: movie.poster,
-        alt: `${movie.poster} Poster`
+        src: movie.Poster,
+        alt: `${movie.Poster} Poster`
       });
 
       $content.append($title, $poster);
@@ -33,17 +33,17 @@
       const $plot = $('<a>');
 
       $plot.addClass('waves-effect waves-light btn modal-trigger');
-      $plot.attr('href', `#${movie.id}`);
+      $plot.attr('href', `#${movie.imdbID}`);
       $plot.text('Plot Synopsis');
 
       $action.append($plot);
       $card.append($action);
 
-      const $modal = $('<div>').addClass('modal').attr('id', movie.id);
+      const $modal = $('<div>').addClass('modal').attr('id', movie.imdbID);
       const $modalContent = $('<div>').addClass('modal-content');
-      const $modalHeader = $('<h4>').text(movie.title);
-      const $movieYear = $('<h6>').text(`Released in ${movie.year}`);
-      const $modalText = $('<p>').text(movie.plot);
+      const $modalHeader = $('<h4>').text(movie.Title);
+      const $movieYear = $('<h6>').text(`Released in ${movie.Year}`);
+      const $modalText = $('<p>').text(movie.Plot);
 
       $modalContent.append($modalHeader, $movieYear, $modalText);
       $modal.append($modalContent);
@@ -56,5 +56,38 @@
     }
   };
 
-  // ADD YOUR CODE HERE
+  let searchBox = document.getElementById('search'),
+  searchButton = document.getElementById('searchButton'),
+  plotButton = document.getElementsByClassName("waves-effect waves-light btn modal-trigger"),
+  searchQuery;
+
+  searchButton.addEventListener("click", function(e) {
+    if(searchBox.value !== "") {
+      e.preventDefault();
+      searchQuery = searchBox.value;
+      searchBox.value = ""
+      $.get(`https://omdb-api.now.sh/?s=${searchQuery}`)
+        .done((data)=>{
+          movies = data.Search;
+          renderMovies()
+        })
+    } else {
+      e.preventDefault();
+      console.log("You didn't search anything.")
+    }
+  })
+
+
+
+  plotButton.addEventListener("click", function() {
+    $.get(`https://omdb-api.now.sh/?i=${movie.imdbID}`)
+      .done((data)=>{
+        movies = data.Plot;
+        renderMovies()
+      })
+  })
+
+
+
+
 })();
