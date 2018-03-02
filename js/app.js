@@ -34,6 +34,7 @@
 
       $plot.addClass('waves-effect waves-light btn modal-trigger');
       $plot.attr('href', `#${movie.imdbID}`);
+      $plot.add(`#${movie.imdbID}`);
       $plot.text('Plot Synopsis');
 
       $action.append($plot);
@@ -53,19 +54,27 @@
       $('#listings').append($col);
 
       $('.modal-trigger').leanModal();
+
+      $plot.click(function() {
+        $.get(`https://omdb-api.now.sh/?i=${movie.imdbID}`)
+          .done((data)=>{
+            console.log(data.Plot);
+            $modalText.append(data.Plot);
+          })
+      })
+
     }
   };
 
-  let searchBox = document.getElementById('search'),
-  searchButton = document.getElementById('searchButton'),
-  plotButton = document.getElementsByClassName("waves-effect waves-light btn modal-trigger"),
-  searchQuery;
+  let searchBox = document.getElementById('search');
+  let searchButton = document.getElementById('searchButton');
+  let searchQuery;
 
   searchButton.addEventListener("click", function(e) {
     if(searchBox.value !== "") {
       e.preventDefault();
       searchQuery = searchBox.value;
-      searchBox.value = ""
+      searchBox.value = "";
       $.get(`https://omdb-api.now.sh/?s=${searchQuery}`)
         .done((data)=>{
           movies = data.Search;
@@ -76,18 +85,5 @@
       console.log("You didn't search anything.")
     }
   })
-
-
-
-  plotButton.addEventListener("click", function() {
-    $.get(`https://omdb-api.now.sh/?i=${movie.imdbID}`)
-      .done((data)=>{
-        movies = data.Plot;
-        renderMovies()
-      })
-  })
-
-
-
 
 })();
